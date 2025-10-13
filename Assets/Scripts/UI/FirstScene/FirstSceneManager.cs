@@ -1,4 +1,6 @@
+using System.Transactions;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class FirstSceneManager : MonoBehaviour
 {
@@ -6,20 +8,58 @@ public class FirstSceneManager : MonoBehaviour
     [SerializeField] private SceneTransitionManager SceneTransitionManager;
 
     [Header("Scene Settings")]
-    [SerializeField] private string NextSceneName = "SelectModeScene";
+    [SerializeField] private bool CanTransition = true;
+    [SerializeField] private string NextSceneName = "UI_SelectModeScene";
 
-    private bool CanTransition = true;
+    [Header("Input Settings")]
+    [SerializeField] private InputActionAsset InputActions;
+    private InputAction SubmitAction;
+
+    void Awake()
+    {
+        // Input Actions에서 Submit 액션 가져오기
+        if (InputActions != null)
+        {
+            SubmitAction = InputActions.FindAction("UI/Submit");
+
+            if (SubmitAction == null)
+            {
+                Debug.LogWarning("Submit 액션을 찾을 수 없습니다. 기본 키 바인딩을 사용합니다.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("InputActionAsset이 할당되지 않았습니다. 기본 키 바인딩을 사용합니다.");
+        }
+    }
+
+    void OnEnable()
+    {
+        if (SubmitAction != null)
+        {
+            SubmitAction.Enable();
+            SubmitAction.performed += OnSubmitPerformed;
+        }
+    }
+
+    void OnDisable()
+    {
+        if (SubmitAction != null)
+        {
+            SubmitAction.performed -= OnSubmitPerformed;
+            SubmitAction.Disable();
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         InitializedFirstScene();
     }
-
+    
     // Update is called once per frame
     void Update()
-    {
-        HandleInput();        
+    {      
     }
 
     private void InitializedFirstScene()
@@ -37,30 +77,22 @@ public class FirstSceneManager : MonoBehaviour
 
         CanTransition = true;
     }
-    private void HandleInput()
-    {
-        if(!CanTransition) { return; }
 
-        if (Input.GetKeyDown(KeyCode.Return))
+    private void OnSubmitPerformed(InputAction.CallbackContext context)
+    {
+        if (CanTransition)
         {
             OnEnterPressed();
         }
     }
-
     private void OnEnterPressed()
     {
-        if (!CanTransition) { return; }
+        Debug.Log("Enter 키 입력 감지");
 
-        CanTransition = false;
-
-        if(SceneTransitionManager == null)
+        if (SceneTransitionManager != null)
         {
-            SceneTransitionManager.
-        }
-        else
-        {
-            Debug.LogError("SceneTransitionManager가 nullptr입니다!");
-            CanTransition = true;
+            CanTransition = false;
+            SceneTransitionManager.TransitionToScene(NextSceneName);
         }
     }
 }
