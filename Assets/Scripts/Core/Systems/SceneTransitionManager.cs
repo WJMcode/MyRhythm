@@ -3,9 +3,18 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using UnityEngine.InputSystem;
 
+// 씬 전환 및 페이드 효과 관리 매니저
 public class SceneTransitionManager : MonoBehaviour
 {
+    [Header("Input Settings")]
+    [SerializeField] private InputActionAsset InputActions;
+    private InputAction SubmitAction;
+
+    [Header("Scene Settings")]
+    [SerializeField] private string NextSceneName;
+
     [Header("Fade Settings")]
     [SerializeField] private Image FadeImage;
     [SerializeField] private float FadeDuration = 1f;
@@ -23,7 +32,23 @@ public class SceneTransitionManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        // scene 전환 시에도 파괴되지 않도록 설정, 싱글톤 패턴 유지
+        DontDestroyOnLoad(gameObject);  
+
+        // Input Actions에서 Submit 액션 가져오기
+        if (InputActions != null)
+        {
+            SubmitAction = InputActions.FindAction("UI/Submit");
+
+            if (SubmitAction == null)
+            {
+                Debug.LogWarning("Submit 액션을 찾을 수 없습니다. 기본 키 바인딩을 사용합니다.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("InputActionAsset이 할당되지 않았습니다. 기본 키 바인딩을 사용합니다.");
+        }
 
         if (FadeImage == null)
         {
@@ -33,16 +58,53 @@ public class SceneTransitionManager : MonoBehaviour
         SetAlpha(0f);
     }
 
+    // New Input System을 위한 함수들(OnEnable, OnDisable)
+    // 스크립트 활성화 시, Input Action 활성화하고 이벤트를 구독
+    void OnEnable()
+    {
+        if (SubmitAction != null)
+        {
+            SubmitAction.Enable();
+            SubmitAction.performed += OnSubmitPerformed;
+        }
+    }
+
+    // 스크립트 비활성화 시, 이벤트 구독을 해제하고 Input Action 비활성화
+    void OnDisable()
+    {
+        if (SubmitAction != null)
+        {
+            SubmitAction.performed -= OnSubmitPerformed;
+            SubmitAction.Disable();
+        }
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+    
+    private void OnSubmitPerformed(InputAction.CallbackContext context)
+    {
+        if (!IsTransitioning)
+        {
+            OnEnterPressed();
+        }
+    }
+    private void OnEnterPressed()
+    {
+        if(NextSceneName == " ")
+        {
+            Debug.LogError("다음 씬 이름이 설정되지 않았습니다!");
+            return;
+        }
+        TransitionToScene(NextSceneName);
     }
 
     // Fade Canvas 자동 생성
