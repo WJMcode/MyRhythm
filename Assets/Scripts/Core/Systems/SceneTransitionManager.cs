@@ -8,21 +8,15 @@ using UnityEngine.InputSystem;
 // 씬 전환 및 페이드 효과 관리 매니저
 public class SceneTransitionManager : MonoBehaviour
 {
-    [Header("Input Settings")]
-    [SerializeField] private InputActionAsset InputActions;
-    private InputAction SubmitAction;
-
-    [Header("Scene Settings")]
-    [SerializeField] private string NextSceneName;
-
-    [Header("Fade Settings")]
-    [SerializeField] private Image FadeImage;
-    [SerializeField] private float FadeDuration = 1f;
-    [SerializeField] private Color FadeColor = Color.black;
-
     public static SceneTransitionManager Instance { get; private set; }
 
-    private bool IsTransitioning = false;
+    [Header("Fade Settings")]
+    [SerializeField] private Image fadeImage;
+    [SerializeField] private float fadeDuration = 1f;
+    [SerializeField] private Color fadeColor = Color.black;
+
+    private bool isTransitioning = false;
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -35,48 +29,12 @@ public class SceneTransitionManager : MonoBehaviour
         // scene 전환 시에도 파괴되지 않도록 설정, 싱글톤 패턴 유지
         DontDestroyOnLoad(gameObject);  
 
-        // Input Actions에서 Submit 액션 가져오기
-        if (InputActions != null)
-        {
-            SubmitAction = InputActions.FindAction("UI/Submit");
-
-            if (SubmitAction == null)
-            {
-                Debug.LogWarning("Submit 액션을 찾을 수 없습니다. 기본 키 바인딩을 사용합니다.");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("InputActionAsset이 할당되지 않았습니다. 기본 키 바인딩을 사용합니다.");
-        }
-
-        if (FadeImage == null)
+        if (fadeImage == null)
         {
             CreateFadeCanvas();
         }
 
         SetAlpha(0f);
-    }
-
-    // New Input System을 위한 함수들(OnEnable, OnDisable)
-    // 스크립트 활성화 시, Input Action 활성화하고 이벤트를 구독
-    void OnEnable()
-    {
-        if (SubmitAction != null)
-        {
-            SubmitAction.Enable();
-            SubmitAction.performed += OnSubmitPerformed;
-        }
-    }
-
-    // 스크립트 비활성화 시, 이벤트 구독을 해제하고 Input Action 비활성화
-    void OnDisable()
-    {
-        if (SubmitAction != null)
-        {
-            SubmitAction.performed -= OnSubmitPerformed;
-            SubmitAction.Disable();
-        }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -89,24 +47,7 @@ public class SceneTransitionManager : MonoBehaviour
     {
         
     }
-    
-    private void OnSubmitPerformed(InputAction.CallbackContext context)
-    {
-        if (!IsTransitioning)
-        {
-            OnEnterPressed();
-        }
-    }
-    private void OnEnterPressed()
-    {
-        if(NextSceneName == " ")
-        {
-            Debug.LogError("다음 씬 이름이 설정되지 않았습니다!");
-            return;
-        }
-        TransitionToScene(NextSceneName);
-    }
-
+   
     // Fade Canvas 자동 생성
     private void CreateFadeCanvas()
     {
@@ -126,11 +67,11 @@ public class SceneTransitionManager : MonoBehaviour
         GameObject imageObj = new GameObject("FadeImage");
         imageObj.transform.SetParent(canvasObj.transform, false);
 
-        FadeImage = imageObj.AddComponent<Image>();
-        FadeImage.color = FadeColor;
+        fadeImage = imageObj.AddComponent<Image>();
+        fadeImage.color = fadeColor;
 
         // 전체 화면 채우기
-        RectTransform rect = FadeImage.GetComponent<RectTransform>();
+        RectTransform rect = fadeImage.GetComponent<RectTransform>();
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
         rect.sizeDelta = Vector2.zero;
@@ -141,7 +82,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     public void TransitionToScene(string sceneName)
     {
-        if (!IsTransitioning)
+        if (!isTransitioning)
         {
             StartCoroutine(TransitionSequence(sceneName));
         }
@@ -149,7 +90,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     IEnumerator TransitionSequence(string sceneName)
     {
-        IsTransitioning = true;
+        isTransitioning = true;
 
         // 1. 페이드 아웃    // yield return으로 인해 첫 번째 루프에서 반환되는 값
         yield return StartCoroutine(FadeOut());
@@ -160,7 +101,7 @@ public class SceneTransitionManager : MonoBehaviour
         // 4. 페이드 인 (새 씬에서) // yield return으로 인해 세 번째 루프에서 반환되는 값
         yield return StartCoroutine(FadeIn());
 
-        IsTransitioning = false;
+        isTransitioning = false;
     }
 
     // 페이드 아웃: 투명 -> 불투명
@@ -169,10 +110,10 @@ public class SceneTransitionManager : MonoBehaviour
     {
         float elapsedTime = 0f;
 
-        while (elapsedTime < FadeDuration)
+        while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
-            float alpha = Mathf.Clamp01(elapsedTime / FadeDuration);
+            float alpha = Mathf.Clamp01(elapsedTime / fadeDuration);
             SetAlpha(alpha);
             yield return null;
         }
@@ -185,10 +126,10 @@ public class SceneTransitionManager : MonoBehaviour
     {
         float elapsedTime = 0f;
 
-        while (elapsedTime < FadeDuration)
+        while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
-            float alpha = 1f - Mathf.Clamp01(elapsedTime / FadeDuration);
+            float alpha = 1f - Mathf.Clamp01(elapsedTime / fadeDuration);
             SetAlpha(alpha);
             yield return null;
         }
@@ -199,11 +140,11 @@ public class SceneTransitionManager : MonoBehaviour
     // 알파값 설정 헬퍼 메서드
     private void SetAlpha(float alpha)
     {
-        if (FadeImage != null)
+        if (fadeImage != null)
         {
-            Color color = FadeImage.color;
+            Color color = fadeImage.color;
             color.a = alpha;
-            FadeImage.color = color;
+            fadeImage.color = color;
         }
     }
 

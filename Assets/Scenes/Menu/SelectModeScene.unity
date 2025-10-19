@@ -617,7 +617,7 @@ GameObject:
   - component: {fileID: 901884358}
   - component: {fileID: 901884359}
   m_Layer: 0
-  m_Name: Manager_Scene
+  m_Name: Manager_SelectModeScene
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -650,6 +650,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c80f69c29c6b25e4a9d0447c32dc63c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectModeSceneManager
+  InputActions: {fileID: -944628639613478452, guid: 8fd715a4bdc403747a08663cee0e6f05, type: 3}
+  buttonSelector: {fileID: 2003111220}
   sceneNames:
   - TrackSelectScene
   - TrackEditScene
@@ -980,7 +982,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 2078945041}
-  - {fileID: 94262777}
-  - {fileID: 74868878}
   - {fileID: 901884358}
   - {fileID: 1574211088}
+  - {fileID: 94262777}
+  - {fileID: 74868878}

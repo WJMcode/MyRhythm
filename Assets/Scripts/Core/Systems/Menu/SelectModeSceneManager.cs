@@ -1,15 +1,14 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class SelectModeSceneManager : MonoBehaviour
+public class SelectModeSceneManager : BaseSceneManager
 {
     [Header("Reference")]
-    private ButtonSelector buttonSelector;
-    private SceneTransitionManager sceneTransitionManager;
+    [SerializeField] private ButtonSelector buttonSelector;
 
-    [Header("Scene Name")]
+    [Header("Scene Settings")]
     [SerializeField] private string[] sceneNames;
-
-    private bool isTransitioning = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -22,15 +21,17 @@ public class SelectModeSceneManager : MonoBehaviour
     {
         
     }
-    void OnEnterPressed()
+
+    protected override void OnSubmit()
     {
-        isTransitioning = true;
-
-        // 선택된 버튼에 따라 씬 결정
         int selectedIndex = buttonSelector.CurrentIndex;
-        string targetScene = sceneNames[selectedIndex];
 
-        // 씬 전환 (페이드아웃 포함)
-        sceneTransitionManager.TransitionToScene(targetScene);
+        if (selectedIndex >= 0 && selectedIndex < sceneNames.Length)
+        {
+            // 선택된 버튼에 따라 씬 결정
+            string targetScene = sceneNames[selectedIndex];
+            // 씬 전환 (페이드아웃 포함)
+            SceneTransitionManager.Instance.TransitionToScene(targetScene);
+        }
     }
 }

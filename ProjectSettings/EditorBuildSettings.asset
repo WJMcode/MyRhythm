@@ -6,11 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Intro/UI_FirstScene.unity
+    path: Assets/Scenes/Intro/FirstScene.unity
     guid: 1dde249f6bb11ee4ab09c81f681e0cf0
   - enabled: 1
-    path: Assets/Scenes/Menu/UI_SelectModeScene.unity
+    path: Assets/Scenes/Menu/SelectModeScene.unity
     guid: ba2cd3d670cb0934a93f156a4bd0af95
+  - enabled: 1
+    path: Assets/Scenes/Menu/TrackSelectScene.unity
+    guid: 3eb464d31cbe37b459511e992a83961e
+  - enabled: 1
+    path: Assets/Scenes/Edit/TrackEditScene.unity
+    guid: aa9c9c45c2128404ca2ce7800b260aed
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

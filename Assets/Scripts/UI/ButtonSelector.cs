@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+// 화면에 표시되는 버튼들 중, 방향키를 통해 버튼을 선택할 수 있음.
+// 그리고 선택된 버튼의 크기를 조절하는 스크립트
 public class ButtonSelector : MonoBehaviour
 {
     [Header("Input Settings")]
