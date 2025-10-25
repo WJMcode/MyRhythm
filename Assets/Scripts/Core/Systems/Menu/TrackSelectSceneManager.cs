@@ -1,15 +1,22 @@
 using UnityEngine;
 
-public class TrackSelectSceneManager : BaseSceneManager
+public class TrackSelectSceneManager : MonoBehaviour
 {
     [Header("Reference")]
     [SerializeField] private TrackSelector trackSelector;
 
-    protected override void OnSubmit()
+    void OnDisable()
     {
-        // 엔터 눌렀을 때 실행
-        SceneTransitionManager.Instance.TransitionToScene("nextSceneName");
+        trackSelector.OnTrackConfirmed += HandleTrackConfirmed;
     }
 
-    
+    void OnDestroy()
+    {
+        trackSelector.OnTrackConfirmed -= HandleTrackConfirmed;
+    }
+    private void HandleTrackConfirmed()
+    {
+        // 인게임 씬으로 전환
+        SceneTransitionManager.Instance.TransitionToScene("DJingScene");
+    }
 }

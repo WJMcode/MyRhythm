@@ -1,12 +1,15 @@
+using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TrackSelector : MonoBehaviour
 {
     [Header("Dependencies")]
     [SerializeField] private SelectorInput selectorInput;
+    public event Action OnTrackConfirmed; // 엔터 입력 알림
 
     [Header("Track List Settings")]
-    [SerializeField] private RectTransform[] trackItems;   // 각 트랙 이미지 RectTransform
+    [SerializeField] public TrackData[] tracks;   // 각 트랙의 정보
     [SerializeField] private RectTransform contentParent;  // 모든 트랙의 부모
     [SerializeField] private float moveSpeed = 10f;        // 중앙 이동 속도
     [SerializeField] private float scaleSpeed = 8f;        // 스케일 보간 속도
@@ -22,19 +25,55 @@ public class TrackSelector : MonoBehaviour
     private int currentIndex = 0;
     private Vector2 targetPosition;
 
+    // RectTransform 배열은 내부적으로 생성
+    private RectTransform[] trackItems;
+
+    // @WJM : 질문 (이 부분의 용도?)
+    void Awake()
+    {
+        // TrackData에서 RectTransform 추출
+        trackItems = new RectTransform[tracks.Length];
+        for (int i = 0; i < tracks.Length; i++)
+        {
+            // 각 TrackData에 rectTransform 필드가 있다고 가정
+            // 또는 자식 오브젝트를 사용
+        }
+    }
+
     void Start()
     {
-        if (selectorInput != null)
-            selectorInput.OnMove += MoveSelection;
-
         UpdateTargetPosition();
         UpdateTrackVisuals(true); // 초기 설정 즉시 반영
+    }
+
+    void OnDisable()
+    {
+        if (selectorInput != null)
+        {
+            selectorInput.OnMove += MoveSelection;
+            selectorInput.OnConfirm += ConfirmSelection;
+        }
     }
 
     void OnDestroy()
     {
         if (selectorInput != null)
+        {
             selectorInput.OnMove -= MoveSelection;
+            selectorInput.OnConfirm += ConfirmSelection;
+        }
+
+    }
+    void ConfirmSelection()
+    {
+        // 선택한 트랙 정보 저장
+        if (GameData.Instance != null)
+        {
+            GameData.Instance.selectedTrack = tracks[currentIndex];
+        }
+
+        // TrackSelectSceneManager에게 엔터 입력 알림
+        OnTrackConfirmed?.Invoke();
     }
 
     void Update()
@@ -52,7 +91,7 @@ public class TrackSelector : MonoBehaviour
 
     void MoveSelection(int direction)
     {
-        int newIndex = Mathf.Clamp(currentIndex + direction, 0, trackItems.Length - 1);
+        int newIndex = Mathf.Clamp(currentIndex + direction, 0, tracks.Length - 1);
         if (newIndex != currentIndex)
         {
             currentIndex = newIndex;
@@ -69,9 +108,9 @@ public class TrackSelector : MonoBehaviour
 
     void UpdateTrackVisuals(bool instant = false)
     {
-        for (int i = 0; i < trackItems.Length; i++)
+        for (int i = 0; i < tracks.Length; i++)
         {
-            RectTransform rect = trackItems[i];
+            RectTransform rect = trackItems[currentIndex];
 
             // 중앙 기준 거리 계산
             int distance = Mathf.Abs(i - currentIndex);

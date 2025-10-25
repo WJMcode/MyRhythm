@@ -186,7 +186,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 800, y: 800}
+  m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &331272697
 MonoBehaviour:
@@ -370,7 +370,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aeb08c66714c7d4eb091ad1b42e3159, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrackSelectSceneManager
-  InputActions: {fileID: -944628639613478452, guid: 8fd715a4bdc403747a08663cee0e6f05, type: 3}
   trackSelector: {fileID: 1478316691}
 --- !u!1 &783104701
 GameObject:
@@ -406,8 +405,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1111, y: 0}
-  m_SizeDelta: {x: 800, y: 800}
+  m_AnchoredPosition: {x: 800, y: 0}
+  m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &783104703
 MonoBehaviour:
@@ -761,9 +760,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrackSelector
   selectorInput: {fileID: 1404815727}
-  trackItems:
-  - {fileID: 331272696}
-  - {fileID: 783104702}
+  tracks:
+  - trackName: GreatDays
+    musicEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+    noteDataFile: {fileID: 0}
+    thumbnail: {fileID: 0}
+    bpm: 0
+  - trackName: 
+    musicEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+    noteDataFile: {fileID: 0}
+    thumbnail: {fileID: 0}
+    bpm: 0
   contentParent: {fileID: 353486909}
   moveSpeed: 10
   scaleSpeed: 8

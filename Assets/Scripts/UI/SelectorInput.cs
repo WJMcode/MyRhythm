@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,9 +8,11 @@ public class SelectorInput : MonoBehaviour
     [Header("Input Settings")]
     [SerializeField] private InputActionAsset inputActions;
     private InputAction selectorMoveAction;
+    private InputAction confirmAction;
 
     // 방향 입력 이벤트 (1: 아래, -1: 위)
     public event Action<int> OnMove;
+    public event Action OnConfirm;
 
     void Awake()
     {
@@ -18,6 +21,10 @@ public class SelectorInput : MonoBehaviour
             selectorMoveAction = inputActions.FindAction("UI/Selector");
             if (selectorMoveAction == null)
                 Debug.LogWarning("UI/Selector 액션을 찾을 수 없습니다.");
+
+            confirmAction = inputActions.FindAction("UI/Submit");
+            if (confirmAction == null)
+                Debug.LogWarning("UI/Submit 액션을 찾을 수 없습니다.");
         }
         else
         {
@@ -33,7 +40,10 @@ public class SelectorInput : MonoBehaviour
         {
             selectorMoveAction.Enable();
             selectorMoveAction.performed += OnMovePerformed;
-        }
+
+            confirmAction.Enable();
+            confirmAction.performed += OnConfirmPerformed;
+        }   
     }
 
     // 스크립트 비활성화 시, 이벤트 구독을 해제하고 Input Action 비활성화
@@ -41,6 +51,9 @@ public class SelectorInput : MonoBehaviour
     {
         if (selectorMoveAction != null)
         {
+            confirmAction.performed -= OnConfirmPerformed;
+            confirmAction.Disable();
+
             selectorMoveAction.performed -= OnMovePerformed;
             selectorMoveAction.Disable();
         }
@@ -57,5 +70,11 @@ public class SelectorInput : MonoBehaviour
             OnMove?.Invoke(+1);   // 아래쪽
         else if (input < 0)
             OnMove?.Invoke(-1);   // 위쪽
+    }
+
+    void OnConfirmPerformed(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            OnConfirm?.Invoke();
     }
 }
