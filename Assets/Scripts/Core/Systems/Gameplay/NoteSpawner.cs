@@ -12,33 +12,87 @@ public class NoteSpawner : MonoBehaviour
 
     [Header("Timing")]
     [SerializeField] private float noteSpeed = 5f;
-    [SerializeField] private float spawnDistance = 10f;  // 판정선에서 스폰 지점까지 거리
+    [SerializeField] private float spawnYPosition = 6f;  // 스폰 높이
+    [SerializeField] private float judgementYPosition = -4f;  // 판정선 높이
 
     [Header("Note Data")]
     [SerializeField] private List<NoteData> notes = new List<NoteData>();
-
     private int currentNoteIndex = 0;
-    private float judgementLineY = -4f;  // 판정선 Y 좌표
+    private float spawnDistance;
 
     void Start()
     {
+        spawnDistance = spawnYPosition - judgementYPosition;
+
         // 테스트용 노트 생성
-        CreateTestNotes();
+        //CreateTestNotes();
+    }
+
+    public void LoadNoteData(TextAsset noteDataFile)
+    {
+        if (noteDataFile != null)
+        {
+            try
+            {
+                NoteDataList noteList = JsonUtility.FromJson<NoteDataList>(noteDataFile.text);
+                notes = new List<NoteData>(noteList.notes);
+                Debug.Log($"노트 {notes.Count}개 로드 완료");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"노트 데이터 로드 실패: {e.Message}");
+                CreateTestNotes();
+            }
+        }
+        else
+        {
+            Debug.LogWarning("노트 데이터가 없습니다. 테스트 노트 생성");
+            CreateTestNotes();
+        }
     }
 
     void Update()
     {
+        //if (!musicManager.IsPlaying) return;
+
+        //float currentTime = musicManager.GetCurrentTime();
+
+        //// 노트 스폰 체크
+        //while (currentNoteIndex < notes.Count)
+        //{
+        //    NoteData noteData = notes[currentNoteIndex];
+
+        //    // 노트가 떨어지는 시간 계산
+        //    float travelTime = spawnDistance / noteSpeed;
+        //    float spawnTime = noteData.time - travelTime;
+
+        //    if (currentTime >= spawnTime)
+        //    {
+        //        SpawnNote(noteData);
+        //        currentNoteIndex++;
+        //    }
+        //    else
+        //    {
+        //        break;
+        //    }
+        //}
+
         if (!musicManager.IsPlaying) return;
 
         float currentTime = musicManager.GetCurrentTime();
+        SpawnNotesAtTime(currentTime);
+    }
 
-        // 노트 스폰 체크
+    void SpawnNotesAtTime(float currentTime)
+    {
         while (currentNoteIndex < notes.Count)
         {
             NoteData noteData = notes[currentNoteIndex];
 
-            // 노트가 떨어지는 시간 계산
+            // 노트가 떨어지는 데 걸리는 시간
             float travelTime = spawnDistance / noteSpeed;
+
+            // 스폰해야 하는 시간 = 판정 시간 - 이동 시간
             float spawnTime = noteData.time - travelTime;
 
             if (currentTime >= spawnTime)
@@ -61,39 +115,29 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
-        GameObject note = Instantiate(notePrefab, spawnPoints[noteData.lane].position, Quaternion.identity);
-        Note noteScript = note.GetComponent<Note>();
-        noteScript.noteData = noteData;
+        Vector3 spawnPos = spawnPoints[noteData.lane].position;
+        GameObject noteObj = Instantiate(notePrefab, spawnPos, Quaternion.identity, transform);
+
+        Note note = noteObj.GetComponent<Note>();
+        note.noteData = noteData;
+        note.fallSpeed = noteSpeed;
 
         Debug.Log($"노트 생성: Lane {noteData.lane}, Time {noteData.time}");
     }
 
     void CreateTestNotes()
     {
-        // 테스트용: 1초마다 각 레인에 노트 생성
-        for (int i = 0; i < 16; i++)
+        // 테스트용: 2초부터 0.5초마다 각 레인에 노트
+        for (int i = 0; i < 20; i++)
         {
             notes.Add(new NoteData
             {
-                time = i * 0.5f,
+                time = 2f + (i * 0.5f),
                 lane = i % spawnPoints.Length,
                 type = NoteType.Normal
             });
         }
-    }
-
-    public void LoadNoteData(TextAsset noteDataFile)
-    {
-        if (noteDataFile != null)
-        {
-            // JSON 또는 CSV 파싱
-            LoadFromJSON(noteDataFile.text);
-        }
-        else
-        {
-            Debug.LogWarning("노트 데이터가 없습니다. 테스트 노트 생성.");
-            CreateTestNotes();
-        }
+        Debug.Log($"테스트 노트 {notes.Count}개 생성");
     }
 
     void LoadFromJSON(string jsonData)

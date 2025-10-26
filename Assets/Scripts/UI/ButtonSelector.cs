@@ -23,7 +23,7 @@ public class ButtonSelector : MonoBehaviour
     public int CurrentIndex => currentIndex;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void OnEnable()
     {
         if (selectorInput != null)
             selectorInput.OnMove += MoveSelection;
@@ -31,7 +31,7 @@ public class ButtonSelector : MonoBehaviour
         // 첫 번째 버튼 선택
         SelectButton(0);
     }
-    void OnDestroy()
+    void OnDisable()
     {
         if (selectorInput != null)
             selectorInput.OnMove -= MoveSelection;

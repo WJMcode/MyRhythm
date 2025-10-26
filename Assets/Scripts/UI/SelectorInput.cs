@@ -40,10 +40,21 @@ public class SelectorInput : MonoBehaviour
         {
             selectorMoveAction.Enable();
             selectorMoveAction.performed += OnMovePerformed;
+        }
+        else
+        {
+            Debug.LogWarning("selectorMoveAction이 null입니다.");
+        }
 
+        if (confirmAction != null)
+        {
             confirmAction.Enable();
             confirmAction.performed += OnConfirmPerformed;
-        }   
+        }
+        else
+        {
+            Debug.LogWarning("confirmAction이 null입니다.");
+        }
     }
 
     // 스크립트 비활성화 시, 이벤트 구독을 해제하고 Input Action 비활성화
@@ -51,11 +62,22 @@ public class SelectorInput : MonoBehaviour
     {
         if (selectorMoveAction != null)
         {
-            confirmAction.performed -= OnConfirmPerformed;
-            confirmAction.Disable();
-
             selectorMoveAction.performed -= OnMovePerformed;
             selectorMoveAction.Disable();
+        }
+        else
+        {
+            Debug.LogWarning("OnDisable() : selectorMoveAction이 이미 null입니다.");
+        }
+
+        if (confirmAction != null)
+        {
+            confirmAction.performed -= OnConfirmPerformed;
+            confirmAction.Disable();
+        }
+        else
+        {
+            Debug.LogWarning("OnDisable() : confirmAction이 이미 null입니다.");
         }
     }
 

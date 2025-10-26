@@ -17,6 +17,7 @@ public class MusicManager : MonoBehaviour
     {
         musicEventRef = eventRef;
         bpm = trackBpm;
+        Debug.Log($"MusicManager 초기화: BPM {bpm}");
     }
 
     public void StartMusic()
@@ -27,6 +28,10 @@ public class MusicManager : MonoBehaviour
             musicEvent.start();
             IsPlaying = true;
             Debug.Log($"Music Started! BPM: {bpm}");
+        }
+        else
+        {
+            Debug.LogError("FMOD Event가 설정되지 않았습니다!");
         }
     }
 

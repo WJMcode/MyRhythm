@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class TrackSelector : MonoBehaviour
 {
@@ -28,15 +27,14 @@ public class TrackSelector : MonoBehaviour
     // RectTransform 배열은 내부적으로 생성
     private RectTransform[] trackItems;
 
-    // @WJM : 질문 (이 부분의 용도?)
+    // 트랙 UI의 RectTransform 참조를 배열로 저장
     void Awake()
     {
         // TrackData에서 RectTransform 추출
         trackItems = new RectTransform[tracks.Length];
         for (int i = 0; i < tracks.Length; i++)
         {
-            // 각 TrackData에 rectTransform 필드가 있다고 가정
-            // 또는 자식 오브젝트를 사용
+            trackItems[i] = tracks[i].rectTransform;
         }
     }
 
@@ -46,7 +44,7 @@ public class TrackSelector : MonoBehaviour
         UpdateTrackVisuals(true); // 초기 설정 즉시 반영
     }
 
-    void OnDisable()
+    void OnEnable()
     {
         if (selectorInput != null)
         {
@@ -55,12 +53,12 @@ public class TrackSelector : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
         if (selectorInput != null)
         {
             selectorInput.OnMove -= MoveSelection;
-            selectorInput.OnConfirm += ConfirmSelection;
+            selectorInput.OnConfirm -= ConfirmSelection;
         }
 
     }
@@ -108,27 +106,17 @@ public class TrackSelector : MonoBehaviour
 
     void UpdateTrackVisuals(bool instant = false)
     {
-        for (int i = 0; i < tracks.Length; i++)
+        for (int i = 0; i < trackItems.Length; i++)
         {
-            RectTransform rect = trackItems[currentIndex];
-
-            // 중앙 기준 거리 계산
-            int distance = Mathf.Abs(i - currentIndex);
-
-            // 크기 결정
-            float targetScale = (i == currentIndex)
-                ? selectedScale
-                : sideScale;
-
-            // X 좌표 오프셋 (양옆으로 살짝 벌려서 입체감)
+            RectTransform rect = trackItems[i];
+            float targetScale = (i == currentIndex) ? selectedScale : sideScale;
             float targetX = (i - currentIndex) * sideOffsetX;
-            Vector3 targetPosition = new Vector3(targetX, rect.anchoredPosition.y, depthZ);
+            Vector3 targetPos = new Vector3(targetX, rect.anchoredPosition.y, depthZ);
 
-            // 보간 적용
             if (instant)
             {
                 rect.localScale = Vector3.one * targetScale;
-                rect.localPosition = targetPosition;
+                rect.localPosition = targetPos;
             }
             else
             {
@@ -137,10 +125,9 @@ public class TrackSelector : MonoBehaviour
                     Vector3.one * targetScale,
                     Time.deltaTime * scaleSpeed
                 );
-
                 rect.localPosition = Vector3.Lerp(
                     rect.localPosition,
-                    targetPosition,
+                    targetPos,
                     Time.deltaTime * moveSpeed
                 );
             }

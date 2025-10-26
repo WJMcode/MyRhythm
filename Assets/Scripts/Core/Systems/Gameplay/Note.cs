@@ -2,9 +2,8 @@ using UnityEngine;
 
 public class Note : MonoBehaviour
 {
-    [SerializeField] private float fallSpeed = 5f;
-
     public NoteData noteData;
+    public float fallSpeed = 5f;
 
     void Update()
     {

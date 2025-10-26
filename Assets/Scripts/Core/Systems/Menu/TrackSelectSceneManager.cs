@@ -5,15 +5,16 @@ public class TrackSelectSceneManager : MonoBehaviour
     [Header("Reference")]
     [SerializeField] private TrackSelector trackSelector;
 
-    void OnDisable()
+    void OnEnable()
     {
         trackSelector.OnTrackConfirmed += HandleTrackConfirmed;
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
         trackSelector.OnTrackConfirmed -= HandleTrackConfirmed;
     }
+
     private void HandleTrackConfirmed()
     {
         // 인게임 씬으로 전환

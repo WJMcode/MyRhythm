@@ -13,3 +13,9 @@ public enum NoteType
     Normal,
     Long
 }
+
+[System.Serializable]
+public class NoteDataList
+{
+    public NoteData[] notes;
+}
