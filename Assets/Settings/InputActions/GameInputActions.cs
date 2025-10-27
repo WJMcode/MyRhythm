@@ -157,6 +157,78 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""InGame"",
+            ""id"": ""450b7bbf-4638-46fe-b5c0-e495a62578c0"",
+            ""actions"": [
+                {
+                    ""name"": ""DJing"",
+                    ""type"": ""Button"",
+                    ""id"": ""982dbf5b-cc66-47f8-a1e7-15a1034922e2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""3ac549ac-4bc5-487f-9353-fcdcd319c27a"",
+                    ""path"": ""<Keyboard>/b"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DJing"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9ae4c1c6-77ac-4e23-8d0f-65031663a969"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DJing"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dad673fe-0af9-4737-917a-af6964eeb719"",
+                    ""path"": ""<Keyboard>/n"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DJing"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""df523eff-e366-4e3d-984d-46296448b745"",
+                    ""path"": ""<Keyboard>/j"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DJing"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9f36b4a3-6dd7-4311-9035-9909eb1c7c95"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DJing"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -165,11 +237,15 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Submit = m_UI.FindAction("Submit", throwIfNotFound: true);
         m_UI_Selector = m_UI.FindAction("Selector", throwIfNotFound: true);
+        // InGame
+        m_InGame = asset.FindActionMap("InGame", throwIfNotFound: true);
+        m_InGame_DJing = m_InGame.FindAction("DJing", throwIfNotFound: true);
     }
 
     ~@GameInputActions()
     {
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, GameInputActions.UI.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_InGame.enabled, "This will cause a leak and performance issues, GameInputActions.InGame.Disable() has not been called.");
     }
 
     /// <summary>
@@ -348,6 +424,102 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="UIActions" /> instance referencing this action map.
     /// </summary>
     public UIActions @UI => new UIActions(this);
+
+    // InGame
+    private readonly InputActionMap m_InGame;
+    private List<IInGameActions> m_InGameActionsCallbackInterfaces = new List<IInGameActions>();
+    private readonly InputAction m_InGame_DJing;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "InGame".
+    /// </summary>
+    public struct InGameActions
+    {
+        private @GameInputActions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public InGameActions(@GameInputActions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "InGame/DJing".
+        /// </summary>
+        public InputAction @DJing => m_Wrapper.m_InGame_DJing;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_InGame; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="InGameActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(InGameActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="InGameActions" />
+        public void AddCallbacks(IInGameActions instance)
+        {
+            if (instance == null || m_Wrapper.m_InGameActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_InGameActionsCallbackInterfaces.Add(instance);
+            @DJing.started += instance.OnDJing;
+            @DJing.performed += instance.OnDJing;
+            @DJing.canceled += instance.OnDJing;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="InGameActions" />
+        private void UnregisterCallbacks(IInGameActions instance)
+        {
+            @DJing.started -= instance.OnDJing;
+            @DJing.performed -= instance.OnDJing;
+            @DJing.canceled -= instance.OnDJing;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="InGameActions.UnregisterCallbacks(IInGameActions)" />.
+        /// </summary>
+        /// <seealso cref="InGameActions.UnregisterCallbacks(IInGameActions)" />
+        public void RemoveCallbacks(IInGameActions instance)
+        {
+            if (m_Wrapper.m_InGameActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="InGameActions.AddCallbacks(IInGameActions)" />
+        /// <seealso cref="InGameActions.RemoveCallbacks(IInGameActions)" />
+        /// <seealso cref="InGameActions.UnregisterCallbacks(IInGameActions)" />
+        public void SetCallbacks(IInGameActions instance)
+        {
+            foreach (var item in m_Wrapper.m_InGameActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_InGameActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="InGameActions" /> instance referencing this action map.
+    /// </summary>
+    public InGameActions @InGame => new InGameActions(this);
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
     /// </summary>
@@ -369,5 +541,20 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnSelector(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "InGame" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="InGameActions.AddCallbacks(IInGameActions)" />
+    /// <seealso cref="InGameActions.RemoveCallbacks(IInGameActions)" />
+    public interface IInGameActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "DJing" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnDJing(InputAction.CallbackContext context);
     }
 }

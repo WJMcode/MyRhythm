@@ -9,11 +9,11 @@ public class NoteSpawner : MonoBehaviour
     [SerializeField] private MusicManager musicManager;
     [SerializeField] private GameObject notePrefab;
     [SerializeField] private Transform[] spawnPoints;  // 각 레인의 스폰 위치
+    [SerializeField] private Transform judgementLine;  // 판정선 Transform
+
 
     [Header("Timing")]
     [SerializeField] private float noteSpeed = 5f;
-    [SerializeField] private float spawnYPosition = 6f;  // 스폰 높이
-    [SerializeField] private float judgementYPosition = -4f;  // 판정선 높이
 
     [Header("Note Data")]
     [SerializeField] private List<NoteData> notes = new List<NoteData>();
@@ -22,10 +22,9 @@ public class NoteSpawner : MonoBehaviour
 
     void Start()
     {
-        spawnDistance = spawnYPosition - judgementYPosition;
-
-        // 테스트용 노트 생성
-        //CreateTestNotes();
+        // 실제 Transform 위치로 거리 계산
+        spawnDistance = spawnPoints[0].position.y - judgementLine.position.y;
+        Debug.Log($"Spawn Distance: {spawnDistance}");
     }
 
     public void LoadNoteData(TextAsset noteDataFile)

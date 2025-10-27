@@ -71,6 +71,78 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "InGame",
+            "id": "450b7bbf-4638-46fe-b5c0-e495a62578c0",
+            "actions": [
+                {
+                    "name": "DJing",
+                    "type": "Button",
+                    "id": "982dbf5b-cc66-47f8-a1e7-15a1034922e2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "3ac549ac-4bc5-487f-9353-fcdcd319c27a",
+                    "path": "<Keyboard>/b",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DJing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9ae4c1c6-77ac-4e23-8d0f-65031663a969",
+                    "path": "<Keyboard>/h",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DJing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dad673fe-0af9-4737-917a-af6964eeb719",
+                    "path": "<Keyboard>/n",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DJing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "df523eff-e366-4e3d-984d-46296448b745",
+                    "path": "<Keyboard>/j",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DJing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9f36b4a3-6dd7-4311-9035-9909eb1c7c95",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DJing",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
