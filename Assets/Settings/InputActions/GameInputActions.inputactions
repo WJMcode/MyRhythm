@@ -77,9 +77,45 @@
             "id": "450b7bbf-4638-46fe-b5c0-e495a62578c0",
             "actions": [
                 {
-                    "name": "DJing",
+                    "name": "Lane0",
                     "type": "Button",
                     "id": "982dbf5b-cc66-47f8-a1e7-15a1034922e2",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Lane1",
+                    "type": "Button",
+                    "id": "d41d6976-ae2b-4360-8e7e-6e3f476d8683",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Lane2",
+                    "type": "Button",
+                    "id": "4df520eb-672c-4b9b-87be-53941504fd14",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Lane3",
+                    "type": "Button",
+                    "id": "4ce2ed77-0ce3-47ec-b825-33e61d8da6e5",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Lane4",
+                    "type": "Button",
+                    "id": "ed2a9ed2-7d39-4900-9be5-cf7ce18a60a3",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -94,51 +130,51 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DJing",
+                    "action": "Lane0",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "9ae4c1c6-77ac-4e23-8d0f-65031663a969",
+                    "id": "a95071ad-b271-4809-995b-4e596d2072b0",
                     "path": "<Keyboard>/h",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DJing",
+                    "action": "Lane1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "dad673fe-0af9-4737-917a-af6964eeb719",
+                    "id": "7707bc4b-a037-4e7b-8890-583bdcf761c5",
                     "path": "<Keyboard>/n",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DJing",
+                    "action": "Lane2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "df523eff-e366-4e3d-984d-46296448b745",
+                    "id": "4735790e-f9c5-4a81-8f5e-348bd0c0c2e0",
                     "path": "<Keyboard>/j",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DJing",
+                    "action": "Lane3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "9f36b4a3-6dd7-4311-9035-9909eb1c7c95",
+                    "id": "7e1a8ac9-f371-41c5-a183-31fc94ed7012",
                     "path": "<Keyboard>/m",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "DJing",
+                    "action": "Lane4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

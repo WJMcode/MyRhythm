@@ -163,9 +163,45 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
             ""id"": ""450b7bbf-4638-46fe-b5c0-e495a62578c0"",
             ""actions"": [
                 {
-                    ""name"": ""DJing"",
+                    ""name"": ""Lane0"",
                     ""type"": ""Button"",
                     ""id"": ""982dbf5b-cc66-47f8-a1e7-15a1034922e2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Lane1"",
+                    ""type"": ""Button"",
+                    ""id"": ""d41d6976-ae2b-4360-8e7e-6e3f476d8683"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Lane2"",
+                    ""type"": ""Button"",
+                    ""id"": ""4df520eb-672c-4b9b-87be-53941504fd14"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Lane3"",
+                    ""type"": ""Button"",
+                    ""id"": ""4ce2ed77-0ce3-47ec-b825-33e61d8da6e5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Lane4"",
+                    ""type"": ""Button"",
+                    ""id"": ""ed2a9ed2-7d39-4900-9be5-cf7ce18a60a3"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -180,51 +216,51 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DJing"",
+                    ""action"": ""Lane0"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9ae4c1c6-77ac-4e23-8d0f-65031663a969"",
+                    ""id"": ""a95071ad-b271-4809-995b-4e596d2072b0"",
                     ""path"": ""<Keyboard>/h"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DJing"",
+                    ""action"": ""Lane1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""dad673fe-0af9-4737-917a-af6964eeb719"",
+                    ""id"": ""7707bc4b-a037-4e7b-8890-583bdcf761c5"",
                     ""path"": ""<Keyboard>/n"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DJing"",
+                    ""action"": ""Lane2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""df523eff-e366-4e3d-984d-46296448b745"",
+                    ""id"": ""4735790e-f9c5-4a81-8f5e-348bd0c0c2e0"",
                     ""path"": ""<Keyboard>/j"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DJing"",
+                    ""action"": ""Lane3"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9f36b4a3-6dd7-4311-9035-9909eb1c7c95"",
+                    ""id"": ""7e1a8ac9-f371-41c5-a183-31fc94ed7012"",
                     ""path"": ""<Keyboard>/m"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""DJing"",
+                    ""action"": ""Lane4"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -239,7 +275,11 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         m_UI_Selector = m_UI.FindAction("Selector", throwIfNotFound: true);
         // InGame
         m_InGame = asset.FindActionMap("InGame", throwIfNotFound: true);
-        m_InGame_DJing = m_InGame.FindAction("DJing", throwIfNotFound: true);
+        m_InGame_Lane0 = m_InGame.FindAction("Lane0", throwIfNotFound: true);
+        m_InGame_Lane1 = m_InGame.FindAction("Lane1", throwIfNotFound: true);
+        m_InGame_Lane2 = m_InGame.FindAction("Lane2", throwIfNotFound: true);
+        m_InGame_Lane3 = m_InGame.FindAction("Lane3", throwIfNotFound: true);
+        m_InGame_Lane4 = m_InGame.FindAction("Lane4", throwIfNotFound: true);
     }
 
     ~@GameInputActions()
@@ -428,7 +468,11 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     // InGame
     private readonly InputActionMap m_InGame;
     private List<IInGameActions> m_InGameActionsCallbackInterfaces = new List<IInGameActions>();
-    private readonly InputAction m_InGame_DJing;
+    private readonly InputAction m_InGame_Lane0;
+    private readonly InputAction m_InGame_Lane1;
+    private readonly InputAction m_InGame_Lane2;
+    private readonly InputAction m_InGame_Lane3;
+    private readonly InputAction m_InGame_Lane4;
     /// <summary>
     /// Provides access to input actions defined in input action map "InGame".
     /// </summary>
@@ -441,9 +485,25 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InGameActions(@GameInputActions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "InGame/DJing".
+        /// Provides access to the underlying input action "InGame/Lane0".
         /// </summary>
-        public InputAction @DJing => m_Wrapper.m_InGame_DJing;
+        public InputAction @Lane0 => m_Wrapper.m_InGame_Lane0;
+        /// <summary>
+        /// Provides access to the underlying input action "InGame/Lane1".
+        /// </summary>
+        public InputAction @Lane1 => m_Wrapper.m_InGame_Lane1;
+        /// <summary>
+        /// Provides access to the underlying input action "InGame/Lane2".
+        /// </summary>
+        public InputAction @Lane2 => m_Wrapper.m_InGame_Lane2;
+        /// <summary>
+        /// Provides access to the underlying input action "InGame/Lane3".
+        /// </summary>
+        public InputAction @Lane3 => m_Wrapper.m_InGame_Lane3;
+        /// <summary>
+        /// Provides access to the underlying input action "InGame/Lane4".
+        /// </summary>
+        public InputAction @Lane4 => m_Wrapper.m_InGame_Lane4;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -470,9 +530,21 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_InGameActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_InGameActionsCallbackInterfaces.Add(instance);
-            @DJing.started += instance.OnDJing;
-            @DJing.performed += instance.OnDJing;
-            @DJing.canceled += instance.OnDJing;
+            @Lane0.started += instance.OnLane0;
+            @Lane0.performed += instance.OnLane0;
+            @Lane0.canceled += instance.OnLane0;
+            @Lane1.started += instance.OnLane1;
+            @Lane1.performed += instance.OnLane1;
+            @Lane1.canceled += instance.OnLane1;
+            @Lane2.started += instance.OnLane2;
+            @Lane2.performed += instance.OnLane2;
+            @Lane2.canceled += instance.OnLane2;
+            @Lane3.started += instance.OnLane3;
+            @Lane3.performed += instance.OnLane3;
+            @Lane3.canceled += instance.OnLane3;
+            @Lane4.started += instance.OnLane4;
+            @Lane4.performed += instance.OnLane4;
+            @Lane4.canceled += instance.OnLane4;
         }
 
         /// <summary>
@@ -484,9 +556,21 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="InGameActions" />
         private void UnregisterCallbacks(IInGameActions instance)
         {
-            @DJing.started -= instance.OnDJing;
-            @DJing.performed -= instance.OnDJing;
-            @DJing.canceled -= instance.OnDJing;
+            @Lane0.started -= instance.OnLane0;
+            @Lane0.performed -= instance.OnLane0;
+            @Lane0.canceled -= instance.OnLane0;
+            @Lane1.started -= instance.OnLane1;
+            @Lane1.performed -= instance.OnLane1;
+            @Lane1.canceled -= instance.OnLane1;
+            @Lane2.started -= instance.OnLane2;
+            @Lane2.performed -= instance.OnLane2;
+            @Lane2.canceled -= instance.OnLane2;
+            @Lane3.started -= instance.OnLane3;
+            @Lane3.performed -= instance.OnLane3;
+            @Lane3.canceled -= instance.OnLane3;
+            @Lane4.started -= instance.OnLane4;
+            @Lane4.performed -= instance.OnLane4;
+            @Lane4.canceled -= instance.OnLane4;
         }
 
         /// <summary>
@@ -550,11 +634,39 @@ public partial class @GameInputActions: IInputActionCollection2, IDisposable
     public interface IInGameActions
     {
         /// <summary>
-        /// Method invoked when associated input action "DJing" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Lane0" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnDJing(InputAction.CallbackContext context);
+        void OnLane0(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Lane1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLane1(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Lane2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLane2(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Lane3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLane3(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Lane4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLane4(InputAction.CallbackContext context);
     }
 }

@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 using static TreeEditor.TreeEditorHelper;
 using UnityEditor.Experimental.GraphView;
@@ -8,8 +8,8 @@ public class NoteSpawner : MonoBehaviour
     [Header("References")]
     [SerializeField] private MusicManager musicManager;
     [SerializeField] private GameObject notePrefab;
-    [SerializeField] private Transform[] spawnPoints;  // °¢ ·¹ÀÎÀÇ ½ºÆù À§Ä¡
-    [SerializeField] private Transform judgementLine;  // ÆÇÁ¤¼± Transform
+    [SerializeField] private Transform[] spawnPoints;  // ê° ë ˆì¸ì˜ ìŠ¤í° ìœ„ì¹˜
+    [SerializeField] private Transform judgementLine;  // íŒì •ì„  Transform
 
 
     [Header("Timing")]
@@ -22,7 +22,7 @@ public class NoteSpawner : MonoBehaviour
 
     void Start()
     {
-        // ½ÇÁ¦ Transform À§Ä¡·Î °Å¸® °è»ê
+        // ì‹¤ì œ Transform ìœ„ì¹˜ë¡œ ê±°ë¦¬ ê³„ì‚°
         spawnDistance = spawnPoints[0].position.y - judgementLine.position.y;
         Debug.Log($"Spawn Distance: {spawnDistance}");
     }
@@ -35,17 +35,17 @@ public class NoteSpawner : MonoBehaviour
             {
                 NoteDataList noteList = JsonUtility.FromJson<NoteDataList>(noteDataFile.text);
                 notes = new List<NoteData>(noteList.notes);
-                Debug.Log($"³ëÆ® {notes.Count}°³ ·Îµå ¿Ï·á");
+                Debug.Log($"ë…¸íŠ¸ {notes.Count}ê°œ ë¡œë“œ ì™„ë£Œ");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"³ëÆ® µ¥ÀÌÅÍ ·Îµå ½ÇÆĞ: {e.Message}");
+                Debug.LogError($"ë…¸íŠ¸ ë°ì´í„° ë¡œë“œ ì‹¤íŒ¨: {e.Message}");
                 CreateTestNotes();
             }
         }
         else
         {
-            Debug.LogWarning("³ëÆ® µ¥ÀÌÅÍ°¡ ¾ø½À´Ï´Ù. Å×½ºÆ® ³ëÆ® »ı¼º");
+            Debug.LogWarning("ë…¸íŠ¸ ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤. í…ŒìŠ¤íŠ¸ ë…¸íŠ¸ ìƒì„±");
             CreateTestNotes();
         }
     }
@@ -56,12 +56,12 @@ public class NoteSpawner : MonoBehaviour
 
         //float currentTime = musicManager.GetCurrentTime();
 
-        //// ³ëÆ® ½ºÆù Ã¼Å©
+        //// ë…¸íŠ¸ ìŠ¤í° ì²´í¬
         //while (currentNoteIndex < notes.Count)
         //{
         //    NoteData noteData = notes[currentNoteIndex];
 
-        //    // ³ëÆ®°¡ ¶³¾îÁö´Â ½Ã°£ °è»ê
+        //    // ë…¸íŠ¸ê°€ ë–¨ì–´ì§€ëŠ” ì‹œê°„ ê³„ì‚°
         //    float travelTime = spawnDistance / noteSpeed;
         //    float spawnTime = noteData.time - travelTime;
 
@@ -88,10 +88,10 @@ public class NoteSpawner : MonoBehaviour
         {
             NoteData noteData = notes[currentNoteIndex];
 
-            // ³ëÆ®°¡ ¶³¾îÁö´Â µ¥ °É¸®´Â ½Ã°£
+            // ë…¸íŠ¸ê°€ ë–¨ì–´ì§€ëŠ” ë° ê±¸ë¦¬ëŠ” ì‹œê°„
             float travelTime = spawnDistance / noteSpeed;
 
-            // ½ºÆùÇØ¾ß ÇÏ´Â ½Ã°£ = ÆÇÁ¤ ½Ã°£ - ÀÌµ¿ ½Ã°£
+            // ìŠ¤í°í•´ì•¼ í•˜ëŠ” ì‹œê°„ = íŒì • ì‹œê°„ - ì´ë™ ì‹œê°„
             float spawnTime = noteData.time - travelTime;
 
             if (currentTime >= spawnTime)
@@ -110,38 +110,45 @@ public class NoteSpawner : MonoBehaviour
     {
         if (noteData.lane < 0 || noteData.lane >= spawnPoints.Length)
         {
-            Debug.LogError($"Àß¸øµÈ ·¹ÀÎ: {noteData.lane}");
+            Debug.LogError($"ì˜ëª»ëœ ë ˆì¸: {noteData.lane}");
             return;
         }
 
-        Vector3 spawnPos = spawnPoints[noteData.lane].position;
-        GameObject noteObj = Instantiate(notePrefab, spawnPos, Quaternion.identity, transform);
+        //Vector3 spawnPos = spawnPoints[noteData.lane].position;
+        //GameObject noteObj = Instantiate(notePrefab, spawnPos, Quaternion.identity, transform);
+
+        //Note note = noteObj.GetComponent<Note>();
+        //note.noteData = noteData;
+        //note.fallSpeed = noteSpeed;
+
+        //Debug.Log($"ë…¸íŠ¸ ìƒì„±: Lane {noteData.lane}, Time {noteData.time}");
+
+        GameObject noteObj = Instantiate(notePrefab, spawnPoints[noteData.lane]);
 
         Note note = noteObj.GetComponent<Note>();
         note.noteData = noteData;
         note.fallSpeed = noteSpeed;
-
-        Debug.Log($"³ëÆ® »ı¼º: Lane {noteData.lane}, Time {noteData.time}");
+        note.targetTime = noteData.time;  // íŒì • ì‹œê°„ ì €ì¥
     }
 
     void CreateTestNotes()
     {
-        // Å×½ºÆ®¿ë: 2ÃÊºÎÅÍ 0.5ÃÊ¸¶´Ù °¢ ·¹ÀÎ¿¡ ³ëÆ®
+        // í…ŒìŠ¤íŠ¸ìš©: 2ì´ˆë¶€í„° 0.5ì´ˆë§ˆë‹¤ ê° ë ˆì¸ì— ë…¸íŠ¸
         for (int i = 0; i < 20; i++)
         {
             notes.Add(new NoteData
             {
-                time = 2f + (i * 0.5f),
+                time = 2f + (i * 1f),
                 lane = i % spawnPoints.Length,
                 type = NoteType.Normal
             });
         }
-        Debug.Log($"Å×½ºÆ® ³ëÆ® {notes.Count}°³ »ı¼º");
+        Debug.Log($"í…ŒìŠ¤íŠ¸ ë…¸íŠ¸ {notes.Count}ê°œ ìƒì„±");
     }
 
     void LoadFromJSON(string jsonData)
     {
-        // JSON ÆÄ½Ì (³ªÁß¿¡ ±¸Çö)
+        // JSON íŒŒì‹± (ë‚˜ì¤‘ì— êµ¬í˜„)
         // NoteDataList data = JsonUtility.FromJson<NoteDataList>(jsonData);
         // notes = data.notes;
     }
