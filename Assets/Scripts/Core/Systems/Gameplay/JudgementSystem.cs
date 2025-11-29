@@ -5,21 +5,28 @@ public class JudgementSystem : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private DJInputManager inputManager;
-    //[SerializeField] private Transform[] judgementAreas;  // 각 레인의 판정 영역
     [SerializeField] private MusicManager musicManager;
+    [SerializeField] private NoteSpawner noteSpawner;
+    [SerializeField] private Transform judgementLine;
 
     [Header("Judgement Settings")]
-    [SerializeField] private float perfectWindow = 0.05f;  // ±50ms
-    [SerializeField] private float greatWindow = 0.1f;     // ±100ms
-    [SerializeField] private float goodWindow = 0.15f;     // ±150ms
+    [SerializeField] private float perfectWindow = 0.05f;
+    [SerializeField] private float coolWindow = 0.1f;
+    [SerializeField] private float goodWindow = 0.15f;
+    [SerializeField] private float missWindow = 0.5f;
 
     [Header("Judgement Area")]
-    [SerializeField] private float judgementRadius = 0.5f;  // 판정 범위 반경
+    [SerializeField] private float judgementAreaHeight = 1.5f; // 위치 기준 판정 범위
+
+    private float judgementLineY;
 
     void Start()
     {
         if (inputManager != null)
             inputManager.OnLaneInput += OnKeyPressed;
+
+        if (judgementLine != null)
+            judgementLineY = judgementLine.position.y;
     }
 
     void OnDestroy()
@@ -28,92 +35,97 @@ public class JudgementSystem : MonoBehaviour
             inputManager.OnLaneInput -= OnKeyPressed;
     }
 
-    void OnKeyPressed(int lane)
+    void Update()
     {
-        Debug.Log($"판정 체크: Lane {lane}");
+        float currentTime = musicManager.GetCurrentTime();
 
-        // FMOD 기반: 현재 음악 시간
-        float currentMusicTime = musicManager.GetCurrentTime();
-
-        // 해당 레인의 노트 찾기
-        Note targetNote = FindNoteByMusicTime(lane, currentMusicTime);
-
-        if (targetNote != null)
+        // 자동 FAIL 처리: 시간 초과된 노트만
+        for (int i = noteSpawner.activeNotes.Count - 1; i >= 0; i--)
         {
-            // 음악 시간 기반 판정!
-            float timingDiff = currentMusicTime - targetNote.targetTime;
-            JudgeNote(targetNote, timingDiff);
-        }
-        else
-        {
-            Debug.Log($"Lane {lane}에 노트 없음 - Miss!");
+            Note note = noteSpawner.activeNotes[i];
+            if (note.judged) continue;
+
+            float timeDiff = currentTime - note.targetTime;
+            if (timeDiff > missWindow)
+            {
+                JudgeNote(note, timeDiff, isAutoFail: true);
+            }
         }
     }
 
-    // 음악 시간 기반으로 노트 찾기
-    Note FindNoteByMusicTime(int lane, float currentTime)
+    void OnKeyPressed(int lane)
     {
-        Note[] allNotes = FindObjectsByType<Note>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        float currentTime = musicManager.GetCurrentTime();
         Note closestNote = null;
         float closestTimeDiff = float.MaxValue;
 
-        foreach (Note note in allNotes)
+        foreach (var note in noteSpawner.activeNotes)
         {
-            // 같은 레인인지 확인
-            if (note.noteData == null || note.noteData.lane != lane)
+            if (note.judged || note.noteData.lane != lane)
                 continue;
 
-            // 시간 차이 계산 (음악 시간 기준!)
+            float distance = Mathf.Abs(note.transform.position.y - judgementLineY);
             float timeDiff = Mathf.Abs(currentTime - note.targetTime);
 
-            // 판정 범위 내인지 (goodWindow 이내)
-            if (timeDiff > goodWindow)
-                continue;
-
-            // 가장 가까운 시간의 노트
-            if (timeDiff < closestTimeDiff)
+            // 입력 가능한 범위: 판정선 근처 + missWindow 안
+            if (distance <= judgementAreaHeight && timeDiff <= missWindow)
             {
-                closestTimeDiff = timeDiff;
-                closestNote = note;
+                if (timeDiff < closestTimeDiff)
+                {
+                    closestTimeDiff = timeDiff;
+                    closestNote = note;
+                }
             }
         }
 
         if (closestNote != null)
         {
-            Debug.Log($"노트 발견! 시간 차이: {closestTimeDiff:F3}초");
+            float timingDiff = currentTime - closestNote.targetTime;
+            JudgeNote(closestNote, timingDiff, isAutoFail: false);
         }
-
-        return closestNote;
+        else
+        {
+            Debug.Log($"Lane {lane}에 판정 가능한 노트 없음!");
+        }
     }
+       
 
-    void JudgeNote(Note note, float timingDiff)
+    void JudgeNote(Note note, float timingDiff, bool isAutoFail)
     {
-        float absTimingDiff = Mathf.Abs(timingDiff);
-        string judgement;
+        if (note.judged) return;
 
-        if (absTimingDiff <= perfectWindow)
+        note.judged = true;
+        string judgement;
+        float absDiff = Mathf.Abs(timingDiff);
+
+        if (isAutoFail)
         {
-            judgement = "PERFECT!";
-            Debug.Log($"<color=yellow>PERFECT!</color> (차이: {timingDiff:F3}초)");
+            judgement = "FAIL";
+            Debug.Log($"<color=red>FAIL</color> (차이: {timingDiff:F3}s)");
         }
-        else if (absTimingDiff <= greatWindow)
+        else if (absDiff <= perfectWindow)
         {
-            judgement = "GREAT!";
-            Debug.Log($"<color=green>GREAT!</color> (차이: {timingDiff:F3}초)");
+            judgement = "PERFECT";
+            Debug.Log($"<color=yellow>PERFECT!</color> (차이: {timingDiff:F3}s)");
         }
-        else if (absTimingDiff <= goodWindow)
+        else if (absDiff <= coolWindow)
+        {
+            judgement = "COOL";
+            Debug.Log($"<color=green>COOL!</color> (차이: {timingDiff:F3}s)");
+        }
+        else if (absDiff <= goodWindow)
         {
             judgement = "GOOD";
-            Debug.Log($"<color=blue>GOOD</color> (차이: {timingDiff:F3}초)");
+            Debug.Log($"<color=blue>GOOD</color> (차이: {timingDiff:F3}s)");
         }
         else
         {
             judgement = "MISS";
-            Debug.Log($"<color=red>MISS</color> (차이: {timingDiff:F3}초)");
-            return;  // Miss는 노트 제거 안 함 (통과하도록)
+            Debug.Log($"<color=purple>MISS</color> (차이: {timingDiff:F3}s)");
         }
 
-        // 노트 제거
+        // 노트 제거 및 리스트에서 제거
+        noteSpawner.activeNotes.Remove(note);
         Destroy(note.gameObject);
     }
 }

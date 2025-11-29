@@ -8,9 +8,8 @@ public class NoteSpawner : MonoBehaviour
     [Header("References")]
     [SerializeField] private MusicManager musicManager;
     [SerializeField] private GameObject notePrefab;
-    [SerializeField] private Transform[] spawnPoints;  // 각 레인의 스폰 위치
-    [SerializeField] private Transform judgementLine;  // 판정선 Transform
-
+    [SerializeField] private Transform[] spawnPoints;
+    [SerializeField] private Transform judgementLine;
 
     [Header("Timing")]
     [SerializeField] private float noteSpeed = 5f;
@@ -20,11 +19,25 @@ public class NoteSpawner : MonoBehaviour
     private int currentNoteIndex = 0;
     private float spawnDistance;
 
+    [HideInInspector] public List<Note> activeNotes = new List<Note>();
+
     void Start()
     {
-        // 실제 Transform 위치로 거리 계산
+        if (judgementLine == null)
+        {
+            Debug.LogError("Judgement Line이 할당되지 않았습니다!");
+            return;
+        }
+
         spawnDistance = spawnPoints[0].position.y - judgementLine.position.y;
-        Debug.Log($"Spawn Distance: {spawnDistance}");
+    }
+
+    void Update()
+    {
+        if (!musicManager.IsPlaying) return;
+
+        float currentTime = musicManager.GetCurrentTime();
+        SpawnNotesAtTime(currentTime);
     }
 
     public void LoadNoteData(TextAsset noteDataFile)
@@ -34,52 +47,20 @@ public class NoteSpawner : MonoBehaviour
             try
             {
                 NoteDataList noteList = JsonUtility.FromJson<NoteDataList>(noteDataFile.text);
-                notes = new List<NoteData>(noteList.notes);
+                notes = new List<NoteData>(noteList.notes); 
                 Debug.Log($"노트 {notes.Count}개 로드 완료");
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"노트 데이터 로드 실패: {e.Message}");
+                Debug.LogError($"노트 데이터 로드 실패: {e.Message}"); 
                 CreateTestNotes();
             }
         }
         else
         {
-            Debug.LogWarning("노트 데이터가 없습니다. 테스트 노트 생성");
+            Debug.LogWarning("노트 데이터가 없습니다. 테스트 노트 생성"); 
             CreateTestNotes();
         }
-    }
-
-    void Update()
-    {
-        //if (!musicManager.IsPlaying) return;
-
-        //float currentTime = musicManager.GetCurrentTime();
-
-        //// 노트 스폰 체크
-        //while (currentNoteIndex < notes.Count)
-        //{
-        //    NoteData noteData = notes[currentNoteIndex];
-
-        //    // 노트가 떨어지는 시간 계산
-        //    float travelTime = spawnDistance / noteSpeed;
-        //    float spawnTime = noteData.time - travelTime;
-
-        //    if (currentTime >= spawnTime)
-        //    {
-        //        SpawnNote(noteData);
-        //        currentNoteIndex++;
-        //    }
-        //    else
-        //    {
-        //        break;
-        //    }
-        //}
-
-        if (!musicManager.IsPlaying) return;
-
-        float currentTime = musicManager.GetCurrentTime();
-        SpawnNotesAtTime(currentTime);
     }
 
     void SpawnNotesAtTime(float currentTime)
@@ -87,11 +68,7 @@ public class NoteSpawner : MonoBehaviour
         while (currentNoteIndex < notes.Count)
         {
             NoteData noteData = notes[currentNoteIndex];
-
-            // 노트가 떨어지는 데 걸리는 시간
             float travelTime = spawnDistance / noteSpeed;
-
-            // 스폰해야 하는 시간 = 판정 시간 - 이동 시간
             float spawnTime = noteData.time - travelTime;
 
             if (currentTime >= spawnTime)
@@ -114,39 +91,40 @@ public class NoteSpawner : MonoBehaviour
             return;
         }
 
-        //Vector3 spawnPos = spawnPoints[noteData.lane].position;
-        //GameObject noteObj = Instantiate(notePrefab, spawnPos, Quaternion.identity, transform);
-
-        //Note note = noteObj.GetComponent<Note>();
-        //note.noteData = noteData;
-        //note.fallSpeed = noteSpeed;
-
-        //Debug.Log($"노트 생성: Lane {noteData.lane}, Time {noteData.time}");
-
-        GameObject noteObj = Instantiate(notePrefab, spawnPoints[noteData.lane]);
+        Transform spawnPoint = spawnPoints[noteData.lane];
+        GameObject noteObj = Instantiate(notePrefab, spawnPoint.position, Quaternion.identity, spawnPoint.parent);
 
         Note note = noteObj.GetComponent<Note>();
         note.noteData = noteData;
         note.fallSpeed = noteSpeed;
-        note.targetTime = noteData.time;  // 판정 시간 저장
+        note.targetTime = noteData.time;
+
+        activeNotes.Add(note);
     }
+      
 
     void CreateTestNotes()
-    {
+    { 
         // 테스트용: 2초부터 0.5초마다 각 레인에 노트
         for (int i = 0; i < 20; i++)
         {
-            notes.Add(new NoteData
+            NoteData noteData = new NoteData
             {
                 time = 2f + (i * 1f),
-                lane = i % spawnPoints.Length,
+                //lane = i % spawnPoints.Length,
+                lane = 0,
                 type = NoteType.Normal
-            });
-        }
-        Debug.Log($"테스트 노트 {notes.Count}개 생성");
+
+            };
+
+            notes.Add(noteData
+            );
+            SpawnNote(noteData);
+        } 
+        Debug.Log($"테스트 노트 {notes.Count}개 생성"); 
     }
 
-    void LoadFromJSON(string jsonData)
+        void LoadFromJSON(string jsonData)
     {
         // JSON 파싱 (나중에 구현)
         // NoteDataList data = JsonUtility.FromJson<NoteDataList>(jsonData);
