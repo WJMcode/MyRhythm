@@ -168,10 +168,11 @@ MonoBehaviour:
   noteSpawner: {fileID: 1656965477}
   judgementLine: {fileID: 1370548534}
   perfectWindow: 0.05
-  coolWindow: 1
-  goodWindow: 2
-  missWindow: 100
-  judgementAreaHeight: 1
+  coolWindow: 0.1
+  goodWindow: 0.15
+  missWindow: 0.3
+  failThreshold: 0.1
+  judgementAreaHeight: 100
 --- !u!1 &318789780
 GameObject:
   m_ObjectHideFlags: 0

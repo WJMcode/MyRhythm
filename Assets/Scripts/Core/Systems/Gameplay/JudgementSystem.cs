@@ -9,14 +9,15 @@ public class JudgementSystem : MonoBehaviour
     [SerializeField] private NoteSpawner noteSpawner;
     [SerializeField] private Transform judgementLine;
 
-    [Header("Judgement Settings")]
-    [SerializeField] private float perfectWindow = 0.05f;
-    [SerializeField] private float coolWindow = 0.1f;
-    [SerializeField] private float goodWindow = 0.15f;
-    [SerializeField] private float missWindow = 0.5f;
+    [Header("Judgement Settings (Early Timing)")]
+    [SerializeField] private float perfectWindow = 0.05f;   // 50ms 빠르게
+    [SerializeField] private float coolWindow = 0.1f;       // 100ms 빠르게
+    [SerializeField] private float goodWindow = 0.15f;      // 150ms 빠르게
+    [SerializeField] private float missWindow = 0.3f;       // 300ms 빠르게
+    [SerializeField] private float failThreshold = 0.1f;    // 100ms 늦으면 자동 FAIL
 
     [Header("Judgement Area")]
-    [SerializeField] private float judgementAreaHeight = 1.5f; // 위치 기준 판정 범위
+    [SerializeField] private float judgementAreaHeight = 1.5f;
 
     private float judgementLineY;
 
@@ -24,7 +25,6 @@ public class JudgementSystem : MonoBehaviour
     {
         if (inputManager != null)
             inputManager.OnLaneInput += OnKeyPressed;
-
         if (judgementLine != null)
             judgementLineY = judgementLine.position.y;
     }
@@ -37,18 +37,30 @@ public class JudgementSystem : MonoBehaviour
 
     void Update()
     {
+        if (!musicManager.IsPlaying) return;
+
         float currentTime = musicManager.GetCurrentTime();
 
-        // 자동 FAIL 처리: 시간 초과된 노트만
+        // 자동 FAIL 처리: targetTime을 지나쳐서 너무 늦은 노트
         for (int i = noteSpawner.activeNotes.Count - 1; i >= 0; i--)
         {
             Note note = noteSpawner.activeNotes[i];
+
+            if (note == null)
+            {
+                noteSpawner.activeNotes.RemoveAt(i);
+                continue;
+            }
+
             if (note.judged) continue;
 
             float timeDiff = currentTime - note.targetTime;
-            if (timeDiff > missWindow)
+
+            // targetTime 지나서 failThreshold 초과하면 FAIL
+            if (timeDiff > failThreshold)
             {
-                JudgeNote(note, timeDiff, isAutoFail: true);
+                Debug.Log($"자동 FAIL: targetTime={note.targetTime:F2}, 현재={currentTime:F2}, 늦음={timeDiff:F3}");
+                JudgeNote(note, timeDiff, "FAIL");
             }
         }
     }
@@ -65,66 +77,101 @@ public class JudgementSystem : MonoBehaviour
                 continue;
 
             float distance = Mathf.Abs(note.transform.position.y - judgementLineY);
-            float timeDiff = Mathf.Abs(currentTime - note.targetTime);
+            float timeDiff = currentTime - note.targetTime;
 
-            // 입력 가능한 범위: 판정선 근처 + missWindow 안
-            if (distance <= judgementAreaHeight && timeDiff <= missWindow)
+            // 입력 가능한 범위: 빠르게만 (-missWindow ~ +failThreshold)
+            // 너무 빠르거나 너무 늦으면 무시
+            if (timeDiff < -missWindow || timeDiff > failThreshold)
+                continue;
+
+            // 위치도 체크
+            if (distance > judgementAreaHeight)
+                continue;
+
+            // 가장 시간 차이가 작은 노트 (절댓값)
+            float absTimeDiff = Mathf.Abs(timeDiff);
+            if (absTimeDiff < closestTimeDiff)
             {
-                if (timeDiff < closestTimeDiff)
-                {
-                    closestTimeDiff = timeDiff;
-                    closestNote = note;
-                }
+                closestTimeDiff = absTimeDiff;
+                closestNote = note;
             }
         }
 
         if (closestNote != null)
         {
             float timingDiff = currentTime - closestNote.targetTime;
-            JudgeNote(closestNote, timingDiff, isAutoFail: false);
+
+            // 단방향 판정 (빠르게만)
+            string judgement = GetJudgement(timingDiff);
+            JudgeNote(closestNote, timingDiff, judgement);
         }
         else
         {
             Debug.Log($"Lane {lane}에 판정 가능한 노트 없음!");
         }
     }
-       
 
-    void JudgeNote(Note note, float timingDiff, bool isAutoFail)
+    // 단방향 판정 로직
+    string GetJudgement(float timingDiff)
     {
-        if (note.judged) return;
+        // timingDiff가 음수 = 빠르게 입력 (targetTime 전)
+        // timingDiff가 양수 = 늦게 입력 (targetTime 후)
 
-        note.judged = true;
-        string judgement;
-        float absDiff = Mathf.Abs(timingDiff);
-
-        if (isAutoFail)
+        if (timingDiff > failThreshold)
         {
-            judgement = "FAIL";
-            Debug.Log($"<color=red>FAIL</color> (차이: {timingDiff:F3}s)");
+            return "FAIL";  // 너무 늦음
         }
-        else if (absDiff <= perfectWindow)
+        else if (timingDiff >= -perfectWindow)
         {
-            judgement = "PERFECT";
-            Debug.Log($"<color=yellow>PERFECT!</color> (차이: {timingDiff:F3}s)");
+            // -0.05 ~ 0.1 범위
+            return "PERFECT";
         }
-        else if (absDiff <= coolWindow)
+        else if (timingDiff >= -coolWindow)
         {
-            judgement = "COOL";
-            Debug.Log($"<color=green>COOL!</color> (차이: {timingDiff:F3}s)");
+            // -0.1 ~ -0.05 범위
+            return "COOL";
         }
-        else if (absDiff <= goodWindow)
+        else if (timingDiff >= -goodWindow)
         {
-            judgement = "GOOD";
-            Debug.Log($"<color=blue>GOOD</color> (차이: {timingDiff:F3}s)");
+            // -0.15 ~ -0.1 범위
+            return "GOOD";
+        }
+        else if (timingDiff >= -missWindow)
+        {
+            // -0.3 ~ -0.15 범위
+            return "MISS";
         }
         else
         {
-            judgement = "MISS";
-            Debug.Log($"<color=purple>MISS</color> (차이: {timingDiff:F3}s)");
+            // -0.3 이전 = 너무 빠름
+            return "MISS";
+        }
+    }
+
+    void JudgeNote(Note note, float timingDiff, string judgement)
+    {
+        if (note.judged) return;
+        note.judged = true;
+
+        switch (judgement)
+        {
+            case "PERFECT":
+                Debug.Log($"<color=yellow>PERFECT!</color> (차이: {timingDiff:F3}s)");
+                break;
+            case "COOL":
+                Debug.Log($"<color=green>COOL!</color> (차이: {timingDiff:F3}s)");
+                break;
+            case "GOOD":
+                Debug.Log($"<color=blue>GOOD</color> (차이: {timingDiff:F3}s)");
+                break;
+            case "MISS":
+                Debug.Log($"<color=purple>MISS</color> (차이: {timingDiff:F3}s)");
+                break;
+            case "FAIL":
+                Debug.Log($"<color=red>FAIL</color> (차이: {timingDiff:F3}s)");
+                break;
         }
 
-        // 노트 제거 및 리스트에서 제거
         noteSpawner.activeNotes.Remove(note);
         Destroy(note.gameObject);
     }

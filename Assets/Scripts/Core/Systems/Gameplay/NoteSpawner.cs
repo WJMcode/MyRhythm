@@ -19,6 +19,7 @@ public class NoteSpawner : MonoBehaviour
     private int currentNoteIndex = 0;
     private float spawnDistance;
 
+    // 활성 노트 리스트
     [HideInInspector] public List<Note> activeNotes = new List<Note>();
 
     void Start()
@@ -30,14 +31,6 @@ public class NoteSpawner : MonoBehaviour
         }
 
         spawnDistance = spawnPoints[0].position.y - judgementLine.position.y;
-    }
-
-    void Update()
-    {
-        if (!musicManager.IsPlaying) return;
-
-        float currentTime = musicManager.GetCurrentTime();
-        SpawnNotesAtTime(currentTime);
     }
 
     public void LoadNoteData(TextAsset noteDataFile)
@@ -63,6 +56,13 @@ public class NoteSpawner : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        if (!musicManager.IsPlaying) return;
+
+        float currentTime = musicManager.GetCurrentTime();
+        SpawnNotesAtTime(currentTime);
+    }
     void SpawnNotesAtTime(float currentTime)
     {
         while (currentNoteIndex < notes.Count)
@@ -119,7 +119,6 @@ public class NoteSpawner : MonoBehaviour
 
             notes.Add(noteData
             );
-            SpawnNote(noteData);
         } 
         Debug.Log($"테스트 노트 {notes.Count}개 생성"); 
     }
